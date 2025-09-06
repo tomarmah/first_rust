@@ -8,10 +8,12 @@ fn main() {
     // println!("The correct number is: {correct}");
     let mut guess_size = String::new();
     let mut game_over = false;
+    let mut correct_set = Vec::new();
 
     //Loop to play game if user doesn't guess correctly
     loop {
         guess_size.clear();
+        correct_set.clear();
         //Ask user how many numbers they want to guess
         println!("Hey, how many numbers do you want to guess?");
 
@@ -28,13 +30,13 @@ fn main() {
         };
 
         //Loop to generate multiple correct numbers
-        let mut correct_set = Vec::new();
-        loop {
-            let correct = rand::thread_rng().gen_range(1..=100);
+
+        for _ in 0..guess_size {
+            let correct = rand::rng().random_range(1..=100);
             correct_set.push(correct);
-            if correct_set.len() as u32 >= guess_size {
-                break;
-            }
+            // if correct_set.len() as u32 >= guess_size {
+            //     break;
+            // }
         }
 
         //Loop to retake entries if user input is incorrect
@@ -43,7 +45,7 @@ fn main() {
             let mut guess_count = 0;
             let mut guesses = Vec::new();
             let mut guess = String::new();
-            loop {
+            while guess_count < guess_size {
                 guess.clear();
                 if guess_count == 0 {
                     println!("Now, guess a number between 1 and 100:");
@@ -66,9 +68,9 @@ fn main() {
                 guesses.push(guess_num);
                 guess_count += 1;
 
-                if guess_count >= guess_size {
-                    break;
-                }
+                // if guess_count >= guess_size {
+                //     break;
+                // }
             }
 
             //Loop to check if guesses were correct
@@ -154,4 +156,8 @@ fn main() {
 
         // println!("{message} again: {message2}");
     }
+    println!("The correct numbers were: {correct_set:?}");
+    // for item in correct_set {
+    //     println!("The correct numbers were: {item}");
+    // }
 }
