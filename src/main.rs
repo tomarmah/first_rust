@@ -4,72 +4,24 @@ use std::cmp::Ordering;
 use std::io;
 
 fn main() {
-    /**
-    //This is not an assignment, it's a binding in rust. It tells us who is responsible for this data and where it is stored.
-    //Variables are immutable by default.
-    let surname = "Armah";
-
-    //To make a variable mutable, we use the mut keyword.
-    let mut firstname = "Tom";
-    let _ = firstname.to_lowercase();
-    // firstname = firstname + " & Jerry";
-
-    //println! is a macro that prints to the console. Macros can be extended to do more. Macros are invoked by exclamation mark.
-    println!("Hello, {firstname} {surname}!");
-    println!(
-        "You can also say Hello this way, {} {}!",
-        firstname,
-        surname.to_lowercase()
-    );
-
-    //Arrays
-    let numbers = [1, 2, 3, 4, 5];
-    println!("The numbers are: {numbers:?}");
-
-    //Play around
-    let mut age = 30;
-    age = age + 15;
-    age = age - 12;
-    age = age - 3;
-    age = age + 23;
-    let boy1 = "Kwame";
-    let boy2 = "Kofi";
-    let mut kofi_age = age - 2;
-    println!("{boy1} is {kofi_age} years old");
-    println!("{boy2} is {} years old", age + 2);
-    kofi_age = age;
-    println!("Now {} and {} are both {} years old", boy1, boy2, age);
-
-    **/
-
-    ///MAJOR CONCEPTS
-    /// 1. STRINGS
-    //This is a string slice.
-    let first = "Firt String";
-    let last = "Last String";
-    println!("{first}");
-
-    //This is a String type.
-    let full = String::from("Full String");
-    let mut guess = String::new();
-
-    //Play around
-    //Guessing game
-    let correct = rand::rng().random_range(1..=100); //With = inclusive, without exclusive
+    // let correct = rand::rng().random_range(1..=100); //With = inclusive, without exclusive
     // println!("The correct number is: {correct}");
+    let mut guess_size = String::new();
+    let mut game_over = false;
+    let mut correct_set = Vec::new();
 
+    //Loop to play game if user doesn't guess correctly
     loop {
-        guess.clear();
-        println!("Hey, guess a number");
+        guess_size.clear();
+        correct_set.clear();
+        //Ask user how many numbers they want to guess
+        println!("Hey, how many numbers do you want to guess?");
 
         io::stdin()
-            .read_line(&mut guess)
+            .read_line(&mut guess_size)
             .expect("Error reading input.");
 
-        // println!("You guessed {}", guess.trim());
-
-        // let guessNum: u32 = guess.trim().parse().expect("Please type a number!");
-        let guessNum: u32 = match guess.trim().parse() {
+        let guess_size: u32 = match guess_size.trim().parse() {
             Ok(num) => num,
             Err(_) => {
                 println!("Please type a number!");
@@ -77,29 +29,135 @@ fn main() {
             }
         };
 
-        let message = if correct == guessNum {
-            // println!("You guessed correctly!");
-            "You guessed correctly!"
-        } else if correct < guessNum {
-            // println!("Too high, try again!");
-            "Too high, try again!"
-        } else if correct > guessNum {
-            // println!("Too low, try again!");
-            "Too low, try again!"
-        } else {
-            // println!("Wrong guess, try again!");
-            "Wrong guess, try again!"
-        };
+        //Loop to generate multiple correct numbers
 
-        let message2 = match guessNum.cmp(&correct) {
-            Ordering::Less => "Too low, try again!",
-            Ordering::Greater => "Too high, try again!",
-            Ordering::Equal => {
-                println!("You guessed correctly!");
-                break;
+        for _ in 0..guess_size {
+            let correct = rand::rng().random_range(1..=100);
+            correct_set.push(correct);
+            // if correct_set.len() as u32 >= guess_size {
+            //     break;
+            // }
+        }
+
+        //Loop to retake entries if user input is incorrect
+        loop {
+            //Loop to receive multiple user entries
+            let mut guess_count = 0;
+            let mut guesses = Vec::new();
+            let mut guess = String::new();
+            while guess_count < guess_size {
+                guess.clear();
+                if guess_count == 0 {
+                    println!("Now, guess a number between 1 and 100:");
+                } else {
+                    println!("Guess another number:");
+                }
+
+                io::stdin()
+                    .read_line(&mut guess)
+                    .expect("Error reading input.");
+
+                let guess_num: u32 = match guess.trim().parse() {
+                    Ok(num) => num,
+                    Err(_) => {
+                        println!("Please type a number!");
+                        continue;
+                    }
+                };
+
+                guesses.push(guess_num);
+                guess_count += 1;
+
+                // if guess_count >= guess_size {
+                //     break;
+                // }
             }
-        };
 
-        println!("{message} again: {message2}");
+            //Loop to check if guesses were correct
+            let mut checker_index = 0;
+            let mut correct_count = 0;
+            loop {
+                if checker_index >= correct_set.len() {
+                    break;
+                }
+                let correct = correct_set[checker_index];
+                let user_guess = guesses[checker_index];
+                let mut message = "";
+
+                match correct.cmp(&user_guess) {
+                    Ordering::Greater => message = "Too low, try again!",
+                    Ordering::Less => message = "Too high, try again!",
+                    Ordering::Equal => {
+                        message = "You guessed correctly!";
+                        correct_count += 1;
+                    }
+                };
+
+                println!(
+                    "For number {} - {}: {}",
+                    checker_index + 1,
+                    user_guess,
+                    message
+                );
+                checker_index += 1;
+                if checker_index >= guess_size as usize {
+                    break;
+                }
+            }
+
+            if correct_count == guess_size {
+                println!("Congratulations! You guessed all numbers correctly!");
+                game_over = true;
+                break;
+            } else {
+                println!(
+                    "You guessed {}/{} numbers correctly. Better luck next time!",
+                    correct_count, guess_size
+                );
+            }
+        }
+        if game_over {
+            break;
+        }
+
+        //Inform user of win or loss status for this round
+
+        // // let guessNum: u32 = guess.trim().parse().expect("Please type a number!");
+        // let guessNum: u32 = match guess.trim().parse() {
+        //     Ok(num) => num,
+        //     Err(_) => {
+        //         println!("Please type a number!");
+        //         continue;
+        //     }
+        // };
+
+        // let message = if correct == guessNum {
+        //     // println!("You guessed correctly!");
+        //     "You guessed correctly!"
+        // } else if correct < guessNum {
+        //     // println!("Too high, try again!");
+        //     "Too high, try again!"
+        // } else if correct > guessNum {
+        //     // println!("Too low, try again!");
+        //     "Too low, try again!"
+        // } else {
+        //     // println!("Wrong guess, try again!");
+        //     "Wrong guess, try again!"
+        // };
+
+        // let message2 = match guessNum.cmp(&correct) {
+        //     Ordering::Less => "Too low, try again!",
+        //     Ordering::Greater => "Too high, try again!",
+        //     Ordering::Equal => {
+        //         println!("You guessed correctly!");
+        //         break;
+        //     }
+        // };
+
+        // println!("{message} again: {message2}");
     }
+    println!("The correct numbers were: {correct_set:?}");
+    // for item in correct_set {
+    //     println!("The correct numbers were: {item}");
+    // }
 }
