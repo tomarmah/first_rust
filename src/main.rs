@@ -1,9 +1,17 @@
+mod examples;
+
+use crate::examples::here::test_here;
 use rand::Rng;
 use std::cmp;
 use std::cmp::Ordering;
 use std::io;
 
 fn main() {
+    examples::here::test_here();
+
+    test_here();
+    // println!("{}", );
+
     // let correct = rand::rng().random_range(1..=100); //With = inclusive, without exclusive
     // println!("The correct number is: {correct}");
     let mut guess_size = String::new();
