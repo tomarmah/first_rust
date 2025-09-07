@@ -56,183 +56,106 @@ use std::io;
 
 fn load_commands() -> Vec<Command> {
     vec![
-        Command {
-            label: "role",
-            description: "This commnand handles role management",
-            options: vec![
-                CommandOption {
-                    label: "list",
-                    description: "see all available command options",
-                },
-                CommandOption {
-                    label: "all",
-                    description: "List all available roles",
-                },
-                CommandOption {
-                    label: "select",
-                    description: "Select a role to perform actions",
-                },
-                CommandOption {
-                    label: "switch",
-                    description: "Switch to a different role",
-                },
+        Command::new(
+            "role",
+            "This command handles role management",
+            vec![
+                CommandOption::new("list", "see all available command options"),
+                CommandOption::new("all", "List all available roles"),
+                CommandOption::new("select", "Select a role to perform actions"),
+                CommandOption::new("switch", "Switch to a different role"),
             ],
-            permissions: vec!["all"],
-        },
-        Command {
-            label: "bank",
-            description: "Manage a bank (Bank Owner only)",
-            permissions: vec!["bank_owner"],
-            options: vec![
-                CommandOption {
-                    label: "list",
-                    description: "see all available options",
-                },
-                CommandOption {
-                    label: "create",
-                    description: "Create a new bank (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "delete",
-                    description: "Delete an existing bank (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "add_cfo",
-                    description: "Add a CFO to the bank (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "remove_cfo",
-                    description: "Remove a CFO from the bank (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "balance",
-                    description: "View the bank's balance (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "deposits",
-                    description: "View total deposits in the bank (Bank Owner only)",
-                },
-                CommandOption {
-                    label: "withdrawals",
-                    description: "View total withdrawals from the bank (Bank Owner only)",
-                },
+            vec!["all"],
+        ),
+        Command::new(
+            "bank",
+            "Manage a bank (Bank Owner only)",
+            vec![
+                CommandOption::new("list", "see all available options"),
+                CommandOption::new("create", "Create a new bank (Bank Owner only)"),
+                CommandOption::new("delete", "Delete an existing bank (Bank Owner only)"),
+                CommandOption::new("add_cfo", "Add a CFO to the bank (Bank Owner only)"),
+                CommandOption::new("remove_cfo", "Remove a CFO from the bank (Bank Owner only)"),
+                CommandOption::new("balance", "View the bank's balance (Bank Owner only)"),
+                CommandOption::new(
+                    "deposits",
+                    "View total deposits in the bank (Bank Owner only)",
+                ),
+                CommandOption::new(
+                    "withdrawals",
+                    "View total withdrawals from the bank (Bank Owner only)",
+                ),
             ],
-        },
-        Command {
-            label: "atm",
-            description: "Manage ATMs (CFO only)",
-            permissions: vec!["cfo"],
-            options: vec![
-                CommandOption {
-                    label: "list",
-                    description: "see all available options",
-                },
-                CommandOption {
-                    label: "setup",
-                    description: "Setup a new ATM (CFO only)",
-                },
-                CommandOption {
-                    label: "all_balances",
-                    description: "View balances of all ATMs (CFO only)",
-                },
-                CommandOption {
-                    label: "balance",
-                    description: "View balance of a specific ATM (CFO only)",
-                },
-                CommandOption {
-                    label: "low_balance_notifications",
-                    description: "View low balance ATM notifications (CFO only)",
-                },
-                CommandOption {
-                    label: "add_money_loader",
-                    description: "Add a money loader (CFO only)",
-                },
-                CommandOption {
-                    label: "remove_money_loader",
-                    description: "Remove a money loader (CFO only)",
-                },
-                CommandOption {
-                    label: "send_load_request",
-                    description: "Send an ATM load request to a money loader (CFO only)",
-                },
+            vec!["bank_owner"],
+        ),
+        Command::new(
+            "atm",
+            "Manage ATMs (CFO only)",
+            vec![
+                CommandOption::new("list", "see all available options"),
+                CommandOption::new("setup", "Setup a new ATM (CFO only)"),
+                CommandOption::new("all_balances", "View balances of all ATMs (CFO only)"),
+                CommandOption::new("balance", "View balance of a specific ATM (CFO only)"),
+                CommandOption::new(
+                    "low_balance_notifications",
+                    "View low balance ATM notifications (CFO only)",
+                ),
+                CommandOption::new("add_money_loader", "Add a money loader (CFO only)"),
+                CommandOption::new("remove_money_loader", "Remove a money loader (CFO only)"),
+                CommandOption::new(
+                    "send_load_request",
+                    "Send an ATM load request to a money loader (CFO only)",
+                ),
             ],
-        },
-        Command {
-            label: "load",
-            description: "Manage all loading activities (Money Loader only)",
-            permissions: vec!["money_loader"],
-            options: vec![
-                CommandOption {
-                    label: "list",
-                    description: "see all available options",
-                },
-                CommandOption {
-                    label: "view_requests",
-                    description: "View all load requests (Money Loader only)",
-                },
-                CommandOption {
-                    label: "accept_request",
-                    description: "Accept a load request (Money Loader only)",
-                },
-                CommandOption {
-                    label: "reject_request",
-                    description: "Reject a load request (Money Loader only)",
-                },
-                CommandOption {
-                    label: "load_money",
-                    description: "Load money to an ATM (Money Loader only)",
-                },
-                CommandOption {
-                    label: "request_money",
-                    description: "Request money to load an ATM (Money Loader only)",
-                },
-                CommandOption {
-                    label: "view_balance",
-                    description: "View your balance (Money Loader only)",
-                },
+            vec!["cfo"],
+        ),
+        Command::new(
+            "load",
+            "Manage all loading activities (Money Loader only)",
+            vec![
+                CommandOption::new("list", "see all available options"),
+                CommandOption::new(
+                    "view_requests",
+                    "View all load requests (Money Loader only)",
+                ),
+                CommandOption::new(
+                    "accept_request",
+                    "Accept a load request (Money Loader only)",
+                ),
+                CommandOption::new(
+                    "reject_request",
+                    "Reject a load request (Money Loader only)",
+                ),
+                CommandOption::new("load_money", "Load money to an ATM (Money Loader only)"),
+                CommandOption::new(
+                    "request_money",
+                    "Request money to load an ATM (Money Loader only)",
+                ),
+                CommandOption::new("view_balance", "View your balance (Money Loader only)"),
             ],
-        },
-        Command {
-            label: "customer",
-            description: "Perform banking acitvities (Customer only)",
-            permissions: vec!["customer"],
-            options: vec![
-                CommandOption {
-                    label: "list",
-                    description: "see all available options",
-                },
-                CommandOption {
-                    label: "withdraw",
-                    description: "Withdraw money from an ATM (Customer only)",
-                },
-                CommandOption {
-                    label: "deposit",
-                    description: "Deposit money into your account (Customer only)",
-                },
-                CommandOption {
-                    label: "balance",
-                    description: "View your account balance (Customer only)",
-                },
-                CommandOption {
-                    label: "transactions",
-                    description: "View your transaction history (Customer only)",
-                },
-                CommandOption {
-                    label: "transfer",
-                    description: "Transfer money to another account (Customer only)",
-                },
-                CommandOption {
-                    label: "change_pin",
-                    description: "Change your PIN (Customer only)",
-                },
+            vec!["money_loader"],
+        ),
+        Command::new(
+            "customer",
+            "Perform banking acitvities (Customer only)",
+            vec![
+                CommandOption::new("list", "see all available options"),
+                CommandOption::new("withdraw", "Withdraw money from an ATM (Customer only)"),
+                CommandOption::new("deposit", "Deposit money into your account (Customer only)"),
+                CommandOption::new("balance", "View your account balance (Customer only)"),
+                CommandOption::new(
+                    "transactions",
+                    "View your transaction history (Customer only)",
+                ),
+                CommandOption::new(
+                    "transfer",
+                    "Transfer money to another account (Customer only)",
+                ),
+                CommandOption::new("change_pin", "Change your PIN (Customer only)"),
             ],
-        },
-        Command {
-            label: "exit",
-            description: "Exit the ATM service",
-            options: vec![],
-            permissions: vec!["all"],
-        },
+            vec!["customer"],
+        ),
+        Command::new("exit", "Exit the ATM service", vec![], vec!["all"]),
     ]
 
     // commands;
@@ -253,7 +176,7 @@ pub fn start() {
             "help" | "h" => {
                 println!("\nAvailable Commands:\n");
                 for command in &commands {
-                    println!("{} - {}", command.label, command.description);
+                    println!("{} - {}", command.label(), command.description());
                 }
                 println!("\n");
             }
