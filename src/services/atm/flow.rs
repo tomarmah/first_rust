@@ -1,58 +1,5 @@
 use super::structs::{Command, CommandOption};
-/**
- * This module handles the flow of the ATM service.
- * It allows:
- *
- * 1. Bank owner to:
- *  - create a bank
- *  - add/remove CFO
- *  - see bank balance
- *  - see total bank deposits
- *  - see total bank withdrawals
- *
- * 2. Banks CFO to:
- *   - Setup ATMs
- *   - See balances of all ATMs
- *   - See balance of a particular ATM
- *   - See notifications of low balance ATMs
- *   - Add/Remove Money loader
- *   - Send ATM load requests to money loaders
- *
- * 3. Money Loaders to:
- *   - See all load requests
- *   - Accept/Reject load requests
- *   - Load money to ATMs
- *   - Request money to load ATM
- *   - See their balance
- *
- * 4. Customers to:
- *   - Withdraw money from ATM
- *   - Deposit money into account
- *   - See their account balance
- *   - See their transaction history
- *   - Transfer money to another account
- *   - Change their PIN
- */
 use std::io;
-
-/**
- * A command consists of a label, description and options.
- * The options of a command are the various kinds of actions it can perform.
- * For example, the "role" command can have options like "switch", "list", "select"
- *  - switch: switch to a different role
- *  - list: list all available roles
- *  - select: select a role to perform actions
- *
- * -- bank commands -- {create, delete, add/remove cfo, view bank balance, view total deposits, view total withdrawals}
- *  -- to perform these commands user must be a bank owner
- * -- atm commands -- {setup atm, view all atm balances, view atm balance, view low balance notifications, add/remove money loader, send load request}
- *  -- to perform these commands user must be a cfo
- * -- load commands -- {view load requests, accept/reject load request, load money to atm, request money to load atm, view loader balance}
- *  -- to perform these commands user must be a money loader
- * -- customer commands -- {withdraw money, deposit money, view account balance, view transaction history, transfer money, change pin}
- *  -- to perform these commands user must be a customer
- * -- exit command -- {exit}
- */
 
 fn load_commands() -> Vec<Command> {
     vec![
@@ -156,18 +103,38 @@ fn load_commands() -> Vec<Command> {
             vec!["customer"],
         ),
         Command::new("exit", "Exit the ATM service", vec![], vec!["all"]),
+        // Command::new("back", "Go back to previous menu", vec![], vec!["all"]),
+        // Command::new("main", "Go back to main menu", vec![], vec!["all"]),
     ]
 
     // commands;
 }
 
+fn load_general_command_options() -> Vec<CommandOption> {
+    vec![
+        CommandOption::new("help", "Display help information"),
+        CommandOption::new("exit", "Exit the ATM service"),
+        CommandOption::new("back", "Go back to Previous menu"),
+        CommandOption::new("main", "Go back to Main menu"),
+    ]
+}
+
+fn find_command<'a>(commands: &'a [Command], label: &str) -> Result<&'a Command, String> {
+    commands
+        .iter()
+        .find(|&cmd| cmd.label().to_lowercase() == label.to_lowercase())
+        .ok_or_else(|| format!("Command '{}' not found", label))
+}
+
 pub fn start() {
     let commands = load_commands();
+    let gen_command_opts = load_general_command_options();
     println!("Welcome to the ATM service! To see all commands type 'help or h'");
     loop {
         // Here we would handle user input and direct to the appropriate functionality
         // For now, we just break the loop to avoid an infinite loop in this example
         let mut input = String::new();
+        let current_command: &Command;
         io::stdin()
             .read_line(&mut input)
             .expect("Error reading input.");
@@ -179,6 +146,26 @@ pub fn start() {
                     println!("{} - {}", command.label(), command.description());
                 }
                 println!("\n");
+            }
+            "role" | "bank" | "atm" | "load" | "customer" => {
+                println!("Available options for this command are:\n");
+                match find_command(&commands, input.trim()) {
+                    Ok(cmd) => {
+                        current_command = cmd;
+                        for option in cmd.options() {
+                            println!("{} - {}", option.label(), option.description());
+                        }
+                        println!();
+                        for gen_option in &gen_command_opts {
+                            println!("{} - {}", gen_option.label(), gen_option.description());
+                        }
+                    }
+                    Err(err) => {
+                        println!("{}", err);
+                    }
+                }
+
+                // break;
             }
             "exit" => {
                 println!("Exiting ATM service. Goodbye!\n");

@@ -1,7 +1,7 @@
 use first::{
     examples::{test_here, try_out},
     games::play,
-    services::atm::start,
+    services::start_atm,
 };
 
 fn main() {
@@ -14,5 +14,5 @@ fn main() {
     //Test formatted print
     // try_out();
 
-    start();
+    start_atm();
 }

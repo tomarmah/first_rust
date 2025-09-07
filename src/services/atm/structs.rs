@@ -63,12 +63,29 @@ impl Command {
 }
 
 pub struct CommandOption {
-    pub label: &'static str,
-    pub description: &'static str,
+    label: &'static str,
+    description: &'static str,
 }
 
 impl CommandOption {
     pub fn new(label: &'static str, description: &'static str) -> Self {
         CommandOption { label, description }
+    }
+
+    //Getter
+    pub fn label(&self) -> &str {
+        self.label
+    }
+
+    pub fn description(&self) -> &str {
+        self.description
+    }
+
+    //Setter
+    pub fn set_label(&mut self, label: &'static str) {
+        self.label = label;
+    }
+    pub fn set_description(&mut self, description: &'static str) {
+        self.description = description;
     }
 }
