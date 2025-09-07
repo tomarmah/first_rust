@@ -1,9 +1,18 @@
-use first::{examples::test_here, games::play};
+use first::{
+    examples::{test_here, try_out},
+    games::play,
+    services::atm::start,
+};
 
 fn main() {
     //Run example code
-    test_here();
+    // test_here();
 
     //Play Guessing Game
-    play();
+    // play();
+
+    //Test formatted print
+    // try_out();
+
+    start();
 }
