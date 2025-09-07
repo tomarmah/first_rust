@@ -110,6 +110,10 @@ fn load_commands() -> Vec<Command> {
     // commands;
 }
 
+fn load_roles() -> Vec<&'static str> {
+    vec!["bank_owner", "cfo", "money_loader", "customer"]
+}
+
 fn load_general_command_options() -> Vec<CommandOption> {
     vec![
         CommandOption::new("help", "Display help information"),
@@ -126,15 +130,24 @@ fn find_command<'a>(commands: &'a [Command], label: &str) -> Result<&'a Command,
         .ok_or_else(|| format!("Command '{}' not found", label))
 }
 
+fn print_general_options(gen_options: &[CommandOption]) {
+    for option in gen_options {
+        println!("{} - {}", option.label(), option.description());
+    }
+    println!();
+}
+
 pub fn start() {
     let commands = load_commands();
     let gen_command_opts = load_general_command_options();
+    let roles = load_roles();
     println!("Welcome to the ATM service! To see all commands type 'help or h'");
+    let mut current_command: &Command = &Command::new("", "", Vec::new(), Vec::new()); // Default to first command
     loop {
         // Here we would handle user input and direct to the appropriate functionality
         // For now, we just break the loop to avoid an infinite loop in this example
         let mut input = String::new();
-        let current_command: &Command;
+
         io::stdin()
             .read_line(&mut input)
             .expect("Error reading input.");
@@ -156,16 +169,27 @@ pub fn start() {
                             println!("{} - {}", option.label(), option.description());
                         }
                         println!();
-                        for gen_option in &gen_command_opts {
-                            println!("{} - {}", gen_option.label(), gen_option.description());
-                        }
+                        print_general_options(&gen_command_opts);
                     }
                     Err(err) => {
                         println!("{}", err);
                     }
                 }
-
-                // break;
+            }
+            "list" => {
+                for option in current_command.options() {
+                    println!("{} - {}", option.label(), option.description());
+                }
+                println!();
+                print_general_options(&gen_command_opts);
+            }
+            "all" => {
+                println!("Available roles are:\n");
+                for role in &roles {
+                    println!("- {}", role);
+                }
+                println!();
+                print_general_options(&gen_command_opts);
             }
             "exit" => {
                 println!("Exiting ATM service. Goodbye!\n");
