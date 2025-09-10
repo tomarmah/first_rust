@@ -191,6 +191,28 @@ pub fn start() {
                 println!();
                 print_general_options(&gen_command_opts);
             }
+            "switch" => match current_command.label().to_lowercase().as_str() {
+                "role" => {
+                    match find_command(&commands, input.trim()) {
+                        Ok(cmd) => {
+                            current_command = cmd;
+                            for option in cmd.options() {
+                                println!("{} - {}", option.label(), option.description());
+                            }
+                            println!();
+                            print_general_options(&gen_command_opts);
+                        }
+                        Err(err) => {
+                            println!("{}", err);
+                        }
+                    }
+                    println!("Please select a role to switch to:");
+                    for role in &roles {
+                        println!("- {}", role);
+                    }
+                }
+                "" | _ => println!("No command selected. Please select a command first.\n"),
+            },
             "exit" => {
                 println!("Exiting ATM service. Goodbye!\n");
                 break;
@@ -199,7 +221,5 @@ pub fn start() {
                 println!("Invalid command. Type 'help' or 'h' to see all commands.\n");
             }
         }
-
-        // break;
     }
 }
