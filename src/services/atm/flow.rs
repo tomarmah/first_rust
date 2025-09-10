@@ -130,6 +130,14 @@ fn find_command<'a>(commands: &'a [Command], label: &str) -> Result<&'a Command,
         .ok_or_else(|| format!("Command '{}' not found", label))
 }
 
+fn find_command_opt<'a>(command: &'a Command, label: &str) -> Result<&'a CommandOption, String> {
+    command
+        .options()
+        .iter()
+        .find(|&opt| opt.label().to_lowercase() == label.to_lowercase())
+        .ok_or_else(|| format!("Command option '{}' not found", label))
+}
+
 fn print_general_options(gen_options: &[CommandOption]) {
     for option in gen_options {
         println!("{} - {}", option.label(), option.description());
@@ -142,7 +150,9 @@ pub fn start() {
     let gen_command_opts = load_general_command_options();
     let roles = load_roles();
     println!("Welcome to the ATM service! To see all commands type 'help or h'");
-    let mut current_command: &Command = &Command::new("", "", Vec::new(), Vec::new()); // Default to first command
+    let mut current_command: &Command = &Command::new("", "", Vec::new(), Vec::new());
+    let mut current_command_option: &CommandOption = &CommandOption::new("", "");
+    // Default to first command
     loop {
         // Here we would handle user input and direct to the appropriate functionality
         // For now, we just break the loop to avoid an infinite loop in this example
@@ -193,14 +203,9 @@ pub fn start() {
             }
             "switch" => match current_command.label().to_lowercase().as_str() {
                 "role" => {
-                    match find_command(&commands, input.trim()) {
+                    match find_command_opt(&current_command, input.trim()) {
                         Ok(cmd) => {
-                            current_command = cmd;
-                            for option in cmd.options() {
-                                println!("{} - {}", option.label(), option.description());
-                            }
-                            println!();
-                            print_general_options(&gen_command_opts);
+                            current_command_option = cmd;
                         }
                         Err(err) => {
                             println!("{}", err);
@@ -213,6 +218,34 @@ pub fn start() {
                 }
                 "" | _ => println!("No command selected. Please select a command first.\n"),
             },
+            "bank_owner" | "cfo" | "money_loader" | "customer" => {
+                //Add checks to prevent invalid role switches
+                println!(
+                    "Switched to role: {}\n\nPlease select an option:\n",
+                    input.trim()
+                );
+                let command_label = match input.trim() {
+                    "bank_owner" => "bank",
+                    "cfo" => "atm",
+                    "money_loader" => "load",
+                    "customer" => "customer",
+                    _ => "",
+                };
+                match find_command(&commands, command_label) {
+                    Ok(cmd) => {
+                        for option in cmd.options() {
+                            println!("{} - {}", option.label(), option.description());
+                        }
+                        println!();
+                        print_general_options(&gen_command_opts);
+                    }
+                    Err(err) => {
+                        println!("{}", err);
+                    }
+                }
+                // print_command_options(input.trim(), &commands, &gen_command_opts);
+                // print_general_options(&gen_command_opts);
+            }
             "exit" => {
                 println!("Exiting ATM service. Goodbye!\n");
                 break;
